@@ -5,10 +5,10 @@ Commands I used in the queries for ElephantSQl
 
 Creating the users table
         CREATE TABLE users (
-        id SERIAL PRIMARY KEY,      
-        first_name VARCHAR(255),
-        last_name VARCHAR(255),
-        age INT
+            id SERIAL PRIMARY KEY,      
+            first_name VARCHAR(255),
+            last_name VARCHAR(255),
+            age INT
         );
 
 
