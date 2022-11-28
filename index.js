@@ -22,8 +22,12 @@ app.get("/users/:id", (req, res) => {
     
     pool
     .query('SELECT * FROM users WHERE id=$1;', [id]) // We inject the id in the request
-    .then(data => res.json(data.rows)) // We can send the data as a JSON
-    .catch(e => res.sendStatus(404)); // In case of problem we send an HTTP code
+    .then(data => (
+        !data.rows.length
+        ? res.status(404).send("Can`t find this user")
+        : res.status(200).json(data.rows)
+    )) // We can send the data as a JSON
+    .catch(e => console.log(e)); // In case of problem we send an HTTP code
 });   
 
 
