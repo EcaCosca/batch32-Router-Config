@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser');
 const { Pool } = require("pg");
+
+app.use(bodyParser.json());
 
 const connectionString = "postgres://pbgvrchd:pK4ngy5Ko2qtKCNg0Roy8nhB9sqSmvhZ@surus.db.elephantsql.com/pbgvrchd"; //Can be found in the Details page
 
@@ -14,7 +17,8 @@ app.get("/users", (req, res) => {
         .then(response => res.send(response.rows))
         .catch(err => console.log(err))
     })
-    .catch((err) => console.error(err.stack));
+    .catch((err) => console.error(err.stack))
+    // next()
 });
 
 app.get("/users/:id", (req, res) => {
@@ -26,9 +30,20 @@ app.get("/users/:id", (req, res) => {
         !data.rows.length
         ? res.status(404).send("Can`t find this user")
         : res.status(200).json(data.rows)
-    )) // We can send the data as a JSON
-    .catch(e => console.log(e)); // In case of problem we send an HTTP code
+        )) // We can send the data as a JSON
+        .catch(e => console.log(e)) // In case of problem we send an HTTP code
 });   
 
+app.post("/users", (req, res) => {
+    // console.log(req.body)
+    // res.json(req.body)
+    const { first_name, last_name, age } = req.body; // We retrieve the id from the form (body-parser)
+   
+    pool
+      .query('INSERT INTO users (first_name, last_name, age ) VALUES ($1, $2, $3);', [first_name, last_name, age])// We inject the name in the request
+      .then(data => res.status(201).json(data))
+      .catch(e => console.log(e)); // In case of problem we send an HTTP code
+});
+   
 
-   app.listen(6000, () => console.log('connected'));
+app.listen(6000, () => console.log('connected'));
