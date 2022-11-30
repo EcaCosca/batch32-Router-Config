@@ -35,15 +35,36 @@ app.get("/users/:id", (req, res) => {
 });   
 
 app.post("/users", (req, res) => {
-    // console.log(req.body)
-    // res.json(req.body)
-    const { first_name, last_name, age } = req.body; // We retrieve the id from the form (body-parser)
-   
+    const { first_name, last_name, age } = req.body;
+    
     pool
-      .query('INSERT INTO users (first_name, last_name, age ) VALUES ($1, $2, $3);', [first_name, last_name, age])// We inject the name in the request
-      .then(data => res.status(201).json(data))
-      .catch(e => console.log(e)); // In case of problem we send an HTTP code
+    .query('INSERT INTO users (first_name, last_name, age ) VALUES ($1, $2, $3);', [first_name, last_name, age])// We inject the name in the request
+    .then(data => res.status(201).json(data))
+    .catch(e => console.log(e));
 });
+    
+app.put('/users/:id', (req, res, next) => {
+    const { first_name, last_name, age } = req.body;
+    const { id } = req.params; // We retrieve the id from the URL
+
+    if(!first_name  || !last_name || !age){
+        console.log('No empty fields')
+    }
+
+    const editData = (editing) => {
+        console.log(editing)
+    }
+
+    pool
+    .query('SELECT * FROM users WHERE id=$1;', [id]) // We inject the id in the request
+    .then(data => (
+        !data.rows.length
+        ? res.status(404).send("Can`t find this user")
+        // : res.status(200).json(data.rows)
+        : editData(data.rows[0])
+        )) // We can send the data as a JSON
+        .catch(e => console.log(e)) // In case of problem we send an HTTP code    
+})
    
 
 app.listen(6000, () => console.log('connected'));
